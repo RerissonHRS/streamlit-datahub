@@ -1,15 +1,16 @@
-## 🧩 Projeto: Streamlit DataHub ##
-💡 O que o app vai fazer?
-Um app web completo com:
+# 📈 DataHub - Dashboard com Streamlit
 
-📊 Dashboards profissionais com dados (gráficos, tabelas, KPIs);
+Este é um app interativo feito com Streamlit, que traz dados reais sobre os municípios do Paraná diretamente da API do IBGE, além de previsão com Machine Learning e integração com API externa de clima.
 
-🗃️ Integração com banco de dados (SQLite ou PostgreSQL);
+## Funcionalidades
 
-🔐 Autenticação com login e senha;
+- 📊 Dashboard com dados reais dos municípios
+- 🌦️ Consulta de clima via OpenWeather
+- 🧠 Previsão com Regressão Linear
+- Deploy fácil com Streamlit Cloud
 
-🌐 Conexão com APIs externas (ex: clima, finanças, etc);
+## Como rodar localmente
 
-🧠 Conexão com modelo de Machine Learning (ex: previsão de vendas, classificação, etc);
-
-☁️ Deploy rápido no Streamlit Cloud.
+```bash
+pip install -r requirements.txt
+streamlit run app.py
