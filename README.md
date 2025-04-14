@@ -5,7 +5,6 @@ Este é um app interativo feito com Streamlit, que traz dados reais sobre os mun
 ## Funcionalidades
 
 - 📊 Dashboard com dados reais dos municípios
-- 🌦️ Consulta de clima via OpenWeather
 - 🧠 Previsão com Regressão Linear
 - Deploy fácil com Streamlit Cloud
 
