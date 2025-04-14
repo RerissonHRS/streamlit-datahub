@@ -1,23 +1,32 @@
-# pages/Dashboard.py
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import os
+import requests
 
-st.title("📊 Dashboard Interativo")
+st.title("📊 Municípios do Paraná - Dados Reais do IBGE")
 
-file_path = "data/dataset.csv"
+url = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/41/municipios"
 
-if os.path.exists(file_path):
-    df = pd.read_csv(file_path)
-else:
-    st.warning("Arquivo de dados não encontrado. Usando dados de exemplo.")
-    df = pd.DataFrame({
-        "Cidade": ["Curitiba", "Londrina", "Maringá"],
-        "Populacao_Estimada": [1963726, 588125, 439321]
-    })
+try:
+    resposta = requests.get(url)
+    resposta.raise_for_status()
+    dados = resposta.json()
 
-st.dataframe(df)
+    # Criar DataFrame com os nomes dos municípios
+    df = pd.DataFrame([{
+        "Código IBGE": municipio["id"],
+        "Município": municipio["nome"],
+        "Microrregião": municipio["microrregiao"]["nome"],
+        "Mesorregião": municipio["microrregiao"]["mesorregiao"]["nome"]
+    } for municipio in dados])
 
-fig = px.bar(df, x="Cidade", y="Populacao_Estimada", title="População por Cidade")
-st.plotly_chart(fig, use_container_width=True)
+    st.success(f"{len(df)} municípios carregados com sucesso.")
+    st.dataframe(df)
+
+    # Exemplo de gráfico: municípios por mesorregião
+    grafico = df["Mesorregião"].value_counts().reset_index()
+    grafico.columns = ["Mesorregião", "Quantidade"]
+
+    st.bar_chart(grafico.set_index("Mesorregião"))
+
+except Exception as e:
+    st.error(f"Erro ao acessar dados: {e}")
