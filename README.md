@@ -1,4 +1,4 @@
-##🧩 Projeto: Streamlit DataHub##
+## 🧩 Projeto: Streamlit DataHub ##
 💡 O que o app vai fazer?
 Um app web completo com:
 
