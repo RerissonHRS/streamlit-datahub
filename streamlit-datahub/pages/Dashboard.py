@@ -2,31 +2,52 @@ import streamlit as st
 import pandas as pd
 import requests
 
-st.title("📊 Municípios do Paraná - Dados Reais do IBGE")
+st.title("📊 Dashboard - Comparativo PIB x Municípios do Paraná")
 
-url = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/41/municipios"
+# -------------------------------
+# 🔹 1. Dados do IBGE - Municípios do Paraná
+# -------------------------------
+url_ibge = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/41/municipios"
+resposta = requests.get(url_ibge)
+dados = resposta.json()
 
+df_ibge = pd.DataFrame([{
+    "Município": item["nome"],
+    "Mesorregião": item["microrregiao"]["mesorregiao"]["nome"]
+} for item in dados])
+
+# -------------------------------
+# 🔹 2. Dados reais de PIB por município (arquivo CSV)
+# -------------------------------
 try:
-    resposta = requests.get(url)
-    resposta.raise_for_status()
-    dados = resposta.json()
+    df_pib = pd.read_csv("data/pib_municipios_pr.csv")  # Substitua pelo nome real do arquivo
+    df_pib["Município"] = df_pib["Município"].str.strip()  # Ajustar nomes
+    df_pib["Município"] = df_pib["Município"].str.title()
 
-    # Criar DataFrame com os nomes dos municípios
-    df = pd.DataFrame([{
-        "Código IBGE": municipio["id"],
-        "Município": municipio["nome"],
-        "Microrregião": municipio["microrregiao"]["nome"],
-        "Mesorregião": municipio["microrregiao"]["mesorregiao"]["nome"]
-    } for municipio in dados])
+    # -------------------------------
+    # 🔹 3. Merge dos dados
+    # -------------------------------
+    df_merge = pd.merge(df_ibge, df_pib, on="Município", how="inner")
 
-    st.success(f"{len(df)} municípios carregados com sucesso.")
-    st.dataframe(df)
+    st.success(f"🔎 {len(df_merge)} municípios encontrados com dados de PIB")
 
-    # Exemplo de gráfico: municípios por mesorregião
-    grafico = df["Mesorregião"].value_counts().reset_index()
-    grafico.columns = ["Mesorregião", "Quantidade"]
+    st.dataframe(df_merge)
 
-    st.bar_chart(grafico.set_index("Mesorregião"))
+    # -------------------------------
+    # 🔹 4. Gráficos comparativos
+    # -------------------------------
 
-except Exception as e:
-    st.error(f"Erro ao acessar dados: {e}")
+    st.subheader("📈 PIB Total por Mesorregião")
+    pib_meso = df_merge.groupby("Mesorregião")["PIB (R$ milhões)"].sum().sort_values(ascending=False)
+    st.bar_chart(pib_meso)
+
+    st.subheader("🏙️ Quantidade de Municípios por Mesorregião")
+    qtd_meso = df_ibge["Mesorregião"].value_counts()
+    st.bar_chart(qtd_meso)
+
+    st.subheader("📉 PIB Médio por Município (por Mesorregião)")
+    media_meso = df_merge.groupby("Mesorregião")["PIB (R$ milhões)"].mean().sort_values(ascending=False)
+    st.bar_chart(media_meso)
+
+except FileNotFoundError:
+    st.error("⚠️ Arquivo com dados de PIB não encontrado. Certifique-se de que 'data/pib_municipios_pr.csv' existe.")
