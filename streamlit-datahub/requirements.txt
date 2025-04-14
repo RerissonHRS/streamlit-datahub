@@ -1,10 +1,6 @@
 streamlit
 pandas
 numpy
-sqlalchemy
-bcrypt
-streamlit-authenticator
-matplotlib
 plotly
-requests
 scikit-learn
+requests

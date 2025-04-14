@@ -2,10 +2,20 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import os
 
 st.title("📊 Dashboard Interativo")
 
-df = pd.read_csv("data/dataset.csv")
+file_path = "data/dataset.csv"
+
+if os.path.exists(file_path):
+    df = pd.read_csv(file_path)
+else:
+    st.warning("Arquivo de dados não encontrado. Usando dados de exemplo.")
+    df = pd.DataFrame({
+        "Cidade": ["Curitiba", "Londrina", "Maringá"],
+        "Populacao_Estimada": [1963726, 588125, 439321]
+    })
 
 st.dataframe(df)
 
